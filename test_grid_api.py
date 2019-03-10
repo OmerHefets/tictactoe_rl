@@ -1,5 +1,6 @@
 from grid_api import Grid
 import pytest
+import mock
 
 g = Grid(3)
 
@@ -23,3 +24,10 @@ g = Grid(3)
 def test_winner(test_input, expected):
     g.set_grid(test_input)
     assert g.find_a_winner() == expected
+
+
+def test_choose_location(monkeypatch):
+    g.set_grid([-1, -1, -1, -1, 1, -1, -1, -1, -1])
+    monkeypatch.setattr('builtins.input', lambda x: 4)
+    assert g.choose_location('x', 'human')
+

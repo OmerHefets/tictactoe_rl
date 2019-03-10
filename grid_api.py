@@ -1,3 +1,5 @@
+import random
+
 class Grid:
     def __init__(self, edge):
         self.edge = edge
@@ -70,11 +72,37 @@ class Grid:
                     return "o_player"
         return "no_winner"
 
+    def change1d_to_2d(self, val):
+        row = int(val / self.edge)
+        column = val % self.edge
+        return row, column
+
+    # change value in the grid, return false if the location is already filled, true if succeeded
+    def choose_location(self, symbol, player):
+        if player == "human":
+            location = int(input("choose (1-9): "))
+            row, column = self.change1d_to_2d(location)
+        else:
+            location = random.randint(1, 10)
+            row, column = self.change1d_to_2d(location)
+        if self.grid[row][column] != -1:
+            return False
+        if symbol == 'x':
+            self.grid[row][column] = 1
+        else:
+            self.grid[row][column] = 0
+        return True
+
+
+"""
+    def game(self):
+        while self.sum < 5:
+"""
 
 grid = Grid(3)
 grid.put_x(2, 2)
 grid.put_x(3, 3)
-grid.put_x(1, 1)
+grid.put_x(1, 2)
 grid.print_grid()
 print(grid.find_a_winner())
 value = [0, 1, 0, 1, 0, 1, 0, 1, 0]
