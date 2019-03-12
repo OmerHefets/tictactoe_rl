@@ -39,16 +39,25 @@ def test_change1d_to_2d(test_input, expected):
 
 # test_input = [grid, user_location]
 @pytest.mark.parametrize("test_input,expected", [
-    (([0, 1, 0, 1, 0, 1, 0, 1, -1], 8), True),
-    (([0, 0, 0, -1, -1, -1, 1, 1, -1], 0), False),
-    (([-1, -1, 0, -1, 0, 1, -1, 1, 0], 0), True),
-    (([1, 1, 1, -1, 1, 0, 0, 0, -1], 3), True),
-    (([1, 0, 0, 1, 1, 1, 0, 0, -1], 6), False),
-    (([-1, -1, -1, -1, -1, -1, -1, -1, -1], 1), True),
-    (([-1, 0, 1, -1, -1, 1, -1, 0, 1], 1), False)
+    (([0, 1, 0, 1, 0, 1, 0, 1, -1], 9), True),
+    (([0, 0, 0, -1, -1, -1, 1, 1, -1], 1), False),
+    (([-1, -1, 0, -1, 0, 1, -1, 1, 0], 1), True),
+    (([1, 1, 1, -1, 1, 0, 0, 0, -1], 4), True),
+    (([1, 0, 0, 1, 1, 1, 0, 0, -1], 7), False),
+    (([-1, -1, -1, -1, -1, -1, -1, -1, -1], 2), True),
+    (([-1, 0, 1, -1, -1, 1, -1, 0, 1], 2), False)
 ])
 def test_choose_location(test_input, expected, monkeypatch):
     g.set_grid(test_input[0])
     monkeypatch.setattr('builtins.input', lambda x: test_input[1])
     assert g.choose_location('x', 'human') == expected
 
+
+@pytest.mark.parametrize("test_input,expected", [
+    ([0, 1, 0, 1, 0, 1, 0, 1, -1], 3),
+    ([0, 0, -1, -1, -1, -1, 1, 1, -1], -3),
+    ([1, 1, 0, -1, 0, 1, -1, 1, 0], 2)
+])
+def test_sum_grid(test_input, expected):
+    g.set_grid(test_input)
+    assert g.sum_grid() == expected
