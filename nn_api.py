@@ -9,6 +9,7 @@ class NeuralNet:
     def __init__(self, layers):
         self.layers = layers
         self.nn_length = len(layers)
+        self.grid_permutations = []
 
     @staticmethod
     def sigma(x):
@@ -17,20 +18,30 @@ class NeuralNet:
     def sigma_der(self, x):
         return self.sigma(x) * (1 - self.sigma(x))
 
-    def init_random_weights(self, rand):
+    def init_random_weights(self, is_rand):
         for i in range(1, self.nn_length):
-            if not rand:
+            if not is_rand:
                 np.random.seed(42)
             # each weights is the size of [l_1][l_0]
             random_weights = np.random.rand(self.layers[i], self.layers[i-1])
             random_weights = (random_weights - 0.5) * 2
             self.weights[i] = random_weights
             # each bias is the size of [l_1][1]
-            if not rand:
+            if not is_rand:
                 np.random.seed(43)
             random_bias = np.random.rand(self.layers[i], 1)
             random_bias = (random_bias - 0.5) * 2
             self.bias[i] = random_bias
+
+    # Recursive function for defining array of (2^n - 1 ) arrays of (n * n) grid permutations
+    def permutations(self, arr, index, MAX_FLOOR):
+        if index > MAX_FLOOR:
+            return
+        local_array = arr[:]
+        local_array.append(index)
+        self.grid_permutations.append(local_array)
+        self.permutations(arr[:], index+1, MAX_FLOOR)
+        self.permutations(local_array, index+1, MAX_FLOOR)
 
     def vectorized_ff(self, x_vector):
         z = {}
@@ -65,12 +76,7 @@ class NeuralNet:
 # init net
 nn_layers = [500, 100, 9]
 nn = NeuralNet(nn_layers)
-nn.init_random_weights(rand=False)
+nn.init_random_weights(is_rand=False)
 random_vector = np.random.rand(500, 1)
 random_vector2 = np.random.rand(9, 1)
-print(nn.bias[2])
-nn.sgd_backpropagation(random_vector, random_vector2, alpha=0.001)
-print(nn.bias[2])
-
-
-# init random input vector
+nn.sgd_backpropagation(random_vector, random_vector2, alpha=0.01)
