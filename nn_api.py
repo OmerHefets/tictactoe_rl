@@ -1,5 +1,13 @@
 import random
 import numpy as np
+import grid_api as g
+
+
+# val 0-8
+def change1d_to_2d(val, edge):
+    row = int(val / edge)
+    column = val % edge
+    return row, column
 
 
 class NeuralNet:
@@ -10,6 +18,7 @@ class NeuralNet:
         self.layers = layers
         self.nn_length = len(layers)
         self.grid_permutations = []
+        self.permutations([], 1, 9)
 
     @staticmethod
     def sigma(x):
@@ -34,14 +43,27 @@ class NeuralNet:
             self.bias[i] = random_bias
 
     # Recursive function for defining array of (2^n - 1 ) arrays of (n * n) grid permutations
-    def permutations(self, arr, index, MAX_FLOOR):
-        if index > MAX_FLOOR:
+    def permutations(self, arr, index, MAX_VAL):
+        if index > MAX_VAL:
             return
         local_array = arr[:]
         local_array.append(index)
         self.grid_permutations.append(local_array)
-        self.permutations(arr[:], index+1, MAX_FLOOR)
-        self.permutations(local_array, index+1, MAX_FLOOR)
+        self.permutations(arr[:], index+1, MAX_VAL)
+        self.permutations(local_array, index+1, MAX_VAL)
+
+    def get_grid_input(self, grid):
+        # Reset input array
+        h_1 = []
+        for array in self.grid_permutations:
+            local_sum = 0
+            for val in array:
+                # (val - 1) since the recursive function's range is 1-9
+                row, column = change1d_to_2d(val-1, 3)
+                local_sum += grid[row][column]
+            h_1.append(local_sum)
+        h_1 = np.reshape(h_1, (-1, 1))
+        return h_1
 
     def vectorized_ff(self, x_vector):
         z = {}
@@ -80,3 +102,7 @@ nn.init_random_weights(is_rand=False)
 random_vector = np.random.rand(500, 1)
 random_vector2 = np.random.rand(9, 1)
 nn.sgd_backpropagation(random_vector, random_vector2, alpha=0.01)
+
+# init grid
+game_grid = g.Grid(3)
+h = nn.get_grid_input(game_grid.grid)
