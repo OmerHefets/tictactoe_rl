@@ -27,6 +27,16 @@ class NeuralNet:
     def sigma_der(self, x):
         return self.sigma(x) * (1 - self.sigma(x))
 
+    def get_net_value(self, para):
+        if para == "permutations":
+            return self.grid_permutations
+        if para == "layers":
+            return self.layers
+        if para == "weights":
+            return self.weights
+        if para == "bias":
+            return self.bias
+
     def init_random_weights(self, is_rand):
         for i in range(1, self.nn_length):
             if not is_rand:
@@ -52,6 +62,7 @@ class NeuralNet:
         self.permutations(arr[:], index+1, MAX_VAL)
         self.permutations(local_array, index+1, MAX_VAL)
 
+    """
     def get_grid_input(self, grid):
         # Reset input array
         h_1 = []
@@ -64,6 +75,7 @@ class NeuralNet:
             h_1.append(local_sum)
         h_1 = np.reshape(h_1, (-1, 1))
         return h_1
+    """
 
     def vectorized_ff(self, x_vector):
         z = {}
@@ -105,4 +117,4 @@ nn.sgd_backpropagation(random_vector, random_vector2, alpha=0.01)
 
 # init grid
 game_grid = g.Grid(3)
-h = nn.get_grid_input(game_grid.grid)
+

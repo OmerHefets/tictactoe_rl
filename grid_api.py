@@ -50,6 +50,9 @@ class Grid:
     def get_val(self, row, column):
         return self.grid[row][column]
 
+    def get_grid(self):
+        return self.grid
+
     def find_a_winner(self):
         # check diagonals
         if self.grid[0][0] == self.grid[1][1] == self.grid[2][2]:
@@ -80,19 +83,20 @@ class Grid:
         return "no_winner"
 
     # val 0-8
-    def change1d_to_2d(self, val):
-        row = int(val / self.edge)
-        column = val % self.edge
+    @staticmethod
+    def change1d_to_2d(val, edge):
+        row = int(val / edge)
+        column = val % edge
         return row, column
 
     # change value in the grid, return false if the location is already filled, true if succeeded
     def choose_location(self, symbol, player):
         if player == "human":
             location = int(input("choose (1-9): ")) - 1
-            row, column = self.change1d_to_2d(location)
+            row, column = self.change1d_to_2d(location, self.edge)
         else:
             location = random.randint(0, 9)
-            row, column = self.change1d_to_2d(location)
+            row, column = self.change1d_to_2d(location, self.edge)
         if self.grid[row][column] != 0:
             return False
         if symbol == 'x':
@@ -129,6 +133,6 @@ class Grid:
 
 
 grid = Grid(3)
-result = grid.game(player1='human', player2='human', print_grid=True)
-print(result)
+#result = grid.game(player1='human', player2='human', print_grid=True)
+#print(result)
 
