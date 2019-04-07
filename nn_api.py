@@ -27,7 +27,7 @@ class NeuralNet:
     def sigma_der(self, x):
         return self.sigma(x) * (1 - self.sigma(x))
 
-    def get_net_value(self, para):
+    def get_nn_value(self, para):
         if para == "permutations":
             return self.grid_permutations
         if para == "layers":
@@ -108,6 +108,7 @@ class NeuralNet:
 
 
 # init net
+"""
 nn_layers = [500, 100, 9]
 nn = NeuralNet(nn_layers)
 nn.init_random_weights(is_rand=False)
@@ -117,4 +118,4 @@ nn.sgd_backpropagation(random_vector, random_vector2, alpha=0.01)
 
 # init grid
 game_grid = g.Grid(3)
-
+"""

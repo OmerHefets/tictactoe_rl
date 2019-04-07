@@ -25,12 +25,15 @@ class Agent:
         return h_1
 
     def action_pipeline(self, grid, neural_net):
-        input_vector = self.get_grid_input(grid.get_grid(), neural_net.get_net_value(neural_net, "permutations"))
-        print(input_vector)
+        neural_net.init_random_weights(is_rand=True)
+        input_vector = self.get_grid_input(grid.get_grid(), neural_net.get_nn_value("permutations"))
+        h_vector, z_vector = neural_net.vectorized_ff(input_vector)
+        grid_values = h_vector[neural_net.nn_length]
 
 
-a = Agent
+a = Agent()
 test_grid = g.Grid(3)
-test_nn = nn.NeuralNet
+nn_layers = [511, 100, 9]
+test_nn = nn.NeuralNet(nn_layers)
 
-a.action_pipeline(a, test_grid, test_nn)
+a.action_pipeline(test_grid, test_nn)

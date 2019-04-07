@@ -92,11 +92,16 @@ class Grid:
     # change value in the grid, return false if the location is already filled, true if succeeded
     def choose_location(self, symbol, player):
         if player == "human":
-            location = int(input("choose (1-9): ")) - 1
+            location = (int(input("choose (1-9): ")) - 1)
             row, column = self.change1d_to_2d(location, self.edge)
+        elif player == "computer":
+            location = (random.randint(1, 9) - 1)
+            row, column = self.change1d_to_2d(location, self.edge)
+            print("###")
+        elif player == 'AI':
+            #
         else:
-            location = random.randint(0, 9)
-            row, column = self.change1d_to_2d(location, self.edge)
+            exit("NO SUCH PLAYER!")
         if self.grid[row][column] != 0:
             return False
         if symbol == 'x':
@@ -133,6 +138,6 @@ class Grid:
 
 
 grid = Grid(3)
-#result = grid.game(player1='human', player2='human', print_grid=True)
-#print(result)
+result = grid.game(player1='human', player2='computer', print_grid=True)
+print(result)
 
