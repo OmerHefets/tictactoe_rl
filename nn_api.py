@@ -1,6 +1,5 @@
 import random
 import numpy as np
-import grid_api as g
 
 
 # val 0-8
@@ -113,9 +112,12 @@ nn_layers = [500, 100, 9]
 nn = NeuralNet(nn_layers)
 nn.init_random_weights(is_rand=False)
 random_vector = np.random.rand(500, 1)
-random_vector2 = np.random.rand(9, 1)
-nn.sgd_backpropagation(random_vector, random_vector2, alpha=0.01)
+h, z = nn.vectorized_ff(random_vector)
 
-# init grid
-game_grid = g.Grid(3)
+y_vec = h[3]
+y_vec[5] = 0
+
+print(nn.bias[1])
+nn.sgd_backpropagation(random_vector, y_vec, alpha=0.1)
+print(nn.bias[1])
 """

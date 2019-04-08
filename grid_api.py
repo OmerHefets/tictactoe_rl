@@ -1,4 +1,5 @@
 import random
+import agent_api as ag
 
 
 class Grid:
@@ -90,7 +91,7 @@ class Grid:
         return row, column
 
     # change value in the grid, return false if the location is already filled, true if succeeded
-    def choose_location(self, symbol, player):
+    def choose_location(self, symbol, player, agent):
         if player == "human":
             location = (int(input("choose (1-9): ")) - 1)
             row, column = self.change1d_to_2d(location, self.edge)
@@ -98,19 +99,24 @@ class Grid:
             location = (random.randint(1, 9) - 1)
             row, column = self.change1d_to_2d(location, self.edge)
             print("###")
-        elif player == 'AI':
-            #
+        elif player == "AI":
+            location = agent.agent_location(grid)
+            row, column = self.change1d_to_2d(location, self.edge)
+            print(agent.grid_current_vals)
+            print("@@@")
         else:
-            exit("NO SUCH PLAYER!")
+            print("no such player!")
+            location = (random.randint(1, 9) - 1)
+            return False, location
         if self.grid[row][column] != 0:
-            return False
+            return False, location
         if symbol == 'x':
             self.grid[row][column] = 1
         else:
             self.grid[row][column] = -1
-        return True
+        return True, location
 
-    def game(self, player1, player2, print_grid):
+    def game(self, player1, player2, defined_agent, print_grid, alpha):
         grid.reset_grid()
         if print_grid:
             grid.print_grid()
@@ -124,9 +130,15 @@ class Grid:
             else:
                 player = player2
                 symbol = 'o'
-            while not grid.choose_location(symbol, player):
+            valid_location, location = grid.choose_location(symbol, player, agent=defined_agent)
+            while not valid_location:
                 if player == 'human':
                     print("The spot is occupied")
+                if player == 'computer':
+                    print("Choosing Again")
+                if player == 'AI':
+                    defined_agent.full_square(location, grid, alpha)
+                valid_location, location = grid.choose_location(symbol, player, agent=defined_agent)
             winner = grid.find_a_winner()
             # change for player2
             turn = not turn
@@ -138,6 +150,7 @@ class Grid:
 
 
 grid = Grid(3)
-result = grid.game(player1='human', player2='computer', print_grid=True)
+niro = ag.Agent()
+result = grid.game(player1='human', player2='AI', defined_agent=niro, print_grid=True, alpha=0.01)
 print(result)
 
