@@ -29,12 +29,14 @@ class NeuralNet:
     def get_nn_value(self, para):
         if para == "permutations":
             return self.grid_permutations
-        if para == "layers":
+        elif para == "layers":
             return self.layers
-        if para == "weights":
+        elif para == "weights":
             return self.weights
-        if para == "bias":
+        elif para == "bias":
             return self.bias
+        else:
+            exit("ERROR, NO SUCH NN VALUE")
 
     def init_random_weights(self, is_rand):
         for i in range(1, self.nn_length):
@@ -60,21 +62,6 @@ class NeuralNet:
         self.grid_permutations.append(local_array)
         self.permutations(arr[:], index+1, MAX_VAL)
         self.permutations(local_array, index+1, MAX_VAL)
-
-    """
-    def get_grid_input(self, grid):
-        # Reset input array
-        h_1 = []
-        for array in self.grid_permutations:
-            local_sum = 0
-            for val in array:
-                # (val - 1) since the recursive function's range is 1-9
-                row, column = change1d_to_2d(val-1, 3)
-                local_sum += grid[row][column]
-            h_1.append(local_sum)
-        h_1 = np.reshape(h_1, (-1, 1))
-        return h_1
-    """
 
     def vectorized_ff(self, x_vector):
         z = {}

@@ -137,7 +137,7 @@ class Grid:
                 if player == 'computer':
                     print("Choosing Again")
                 if player == 'AI':
-                    defined_agent.full_square(location, grid, alpha)
+                    defined_agent.full_square_backpropagation(location, grid, alpha)
                 valid_location, location = grid.choose_location(symbol, player, agent=defined_agent)
             winner = grid.find_a_winner()
             # change for player2
@@ -145,12 +145,18 @@ class Grid:
             if print_grid:
                 grid.print_grid()
             if winner != 'no_winner':
+                defined_agent.win_or_lose_backpropagation(location, grid, alpha)
                 return winner
+            # Q-Learning implementation if the player is the AI
+            #if player == 'AI':
+
         return "draw"
+
+    #def training(self, iterations, defined_agent):
+
 
 
 grid = Grid(3)
 niro = ag.Agent()
 result = grid.game(player1='human', player2='AI', defined_agent=niro, print_grid=True, alpha=0.01)
 print(result)
-
