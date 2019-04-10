@@ -51,8 +51,13 @@ class Grid:
     def get_val(self, row, column):
         return self.grid[row][column]
 
+    # return grid value and not a reference
     def get_grid(self):
-        return self.grid
+        returned_grid = []
+        for arr in range(len(self.grid)):
+            temp = self.grid[arr][:]
+            returned_grid.append(temp)
+        return returned_grid
 
     def find_a_winner(self):
         # check diagonals
@@ -130,7 +135,9 @@ class Grid:
             else:
                 player = player2
                 symbol = 'o'
+            print(defined_agent.current_grid)
             valid_location, location = grid.choose_location(symbol, player, agent=defined_agent)
+            print(defined_agent.current_grid)
             while not valid_location:
                 if player == 'human':
                     print("The spot is occupied")
