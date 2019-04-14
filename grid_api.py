@@ -3,6 +3,8 @@ import agent_api as ag
 
 
 class Grid:
+    Q_ALPHA = 0.5
+
     def __init__(self, edge):
         self.edge = edge
         # Make (edge * edge) dimensional grid. initialize to 0 (empty) values
@@ -107,6 +109,7 @@ class Grid:
         elif player == "AI":
             location = agent.agent_location(grid)
             row, column = self.change1d_to_2d(location, self.edge)
+            print("@@@")
             print(agent.grid_current_vals)
             print("@@@")
         else:
@@ -144,7 +147,9 @@ class Grid:
                 if player == 'computer':
                     print("Choosing Again")
                 if player == 'AI':
+                    print(defined_agent.grid_current_vals)
                     defined_agent.full_square_backpropagation(location, grid, alpha)
+                    print(defined_agent.grid_current_vals)
                 valid_location, location = grid.choose_location(symbol, player, agent=defined_agent)
             winner = grid.find_a_winner()
             # change for player2
@@ -152,18 +157,20 @@ class Grid:
             if print_grid:
                 grid.print_grid()
             if winner != 'no_winner':
-                defined_agent.win_or_lose_backpropagation(location, grid, alpha)
+                print(defined_agent.grid_current_vals)
+                defined_agent.win_or_lose_backpropagation(location, alpha)
+                print(defined_agent.grid_current_vals)
                 return winner
             # Q-Learning implementation if the player is the AI
-            #if player == 'AI':
+            if player == 'AI':
+                print(defined_agent.grid_current_vals)
+                defined_agent.q_learning_backpropagation(location, grid, bp_alpha=alpha, q_alpha=self.Q_ALPHA)
+                print(defined_agent.grid_current_vals)
 
         return "draw"
-
-    #def training(self, iterations, defined_agent):
-
 
 
 grid = Grid(3)
 niro = ag.Agent()
-result = grid.game(player1='human', player2='AI', defined_agent=niro, print_grid=True, alpha=0.01)
+result = grid.game(player1='computer', player2='AI', defined_agent=niro, print_grid=True, alpha=0.01)
 print(result)

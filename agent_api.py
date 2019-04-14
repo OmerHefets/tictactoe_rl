@@ -41,7 +41,7 @@ class Agent:
     # for the full square option, backpropagate with all values equal, except the selected (MAX val) as 0
     def full_square_backpropagation(self, filled_location, grid, alpha):
         input_vector = self.get_grid_input(grid.get_grid(), self.neural_net.get_nn_value("permutations"))
-        y_vector = self.grid_current_vals
+        y_vector = self.grid_current_vals[:]
         y_vector[filled_location] = 0
         self.neural_net.sgd_backpropagation(input_vector, y_vector, alpha=alpha)
 
@@ -53,14 +53,21 @@ class Agent:
     """
     def win_or_lose_backpropagation(self, filled_location, alpha):
         # Using current grid because we ignore the last symbol on the grid
-        input_vector = self.get_grid_input(self.current_grid, self.neural_net.get_nn_value("permutations"))
-        y_vector = self.grid_current_vals
+        previous_input_vector = self.get_grid_input(self.current_grid, self.neural_net.get_nn_value("permutations"))
+        y_vector = self.grid_current_vals[:]
         y_vector[filled_location] = 1
-        self.neural_net.sgd_backpropagation(input_vector, y_vector, alpha=alpha)
+        self.neural_net.sgd_backpropagation(previous_input_vector, y_vector, alpha=alpha)
 
     def q_learning_backpropagation(self, filled_location, grid, bp_alpha, q_alpha):
         previous_input_vector = self.get_grid_input(self.current_grid, self.neural_net.get_nn_value("permutations"))
         current_input_vector = self.get_grid_input(grid.get_grid(), self.neural_net.get_nn_value("permutations"))
-        projected_grid_vals = self.neural_net.vectorized_ff(current_input_vector)
+        h_vector, z_vector = self.neural_net.vectorized_ff(current_input_vector)
+        projected_grid_vals = h_vector[self.neural_net.nn_length]
         q_next_state = max(projected_grid_vals)
+        q_current = max(self.grid_current_vals)
+        print(q_current)
+        print(self.grid_current_vals[filled_location])
+        y_vector = self.grid_current_vals[:]
+        y_vector[filled_location] = (q_alpha * q_current) + (1 - q_alpha) * q_next_state
+        self.neural_net.sgd_backpropagation(previous_input_vector, y_vector, alpha=bp_alpha)
 
