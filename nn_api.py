@@ -13,11 +13,16 @@ class NeuralNet:
     weights = {}
     bias = {}
 
-    def __init__(self, layers):
+    def __init__(self, layers, existing_weights):
         self.layers = layers
         self.nn_length = len(layers)
         self.grid_permutations = []
         self.permutations([], 1, 9)
+        if existing_weights:
+            self.load_weights()
+            print(self.weights)
+        else:
+            self.init_random_weights(is_rand=True)
 
     @staticmethod
     def sigma(x):
@@ -52,6 +57,16 @@ class NeuralNet:
             random_bias = np.random.rand(self.layers[i], 1)
             random_bias = (random_bias - 0.5) * 2
             self.bias[i] = random_bias
+
+    def print_weights(self):
+        for i in range(1, self.nn_length):
+            filename = "weights" + str(i) + ".csv"
+            np.savetxt(filename, self.weights[i] , delimiter=",")
+
+    def load_weights(self):
+        for i in range(1, self.nn_length):
+            filename = "weights" + str(i) + ".csv"
+            self.weights[i] = np.genfromtxt(filename, delimiter=",")
 
     # Recursive function for defining array of (2^n - 1 ) arrays of (n * n) grid permutations
     def permutations(self, arr, index, MAX_VAL):

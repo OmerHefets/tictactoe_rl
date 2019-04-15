@@ -22,7 +22,7 @@ class Grid:
     def reset_grid(self):
         size = len(self.grid)
         self.grid = [[0 for x in range(size)] for y in range(size)]
-        return grid
+        return self.grid
 
     def is_full(self):
         for i in range(self.edge):
@@ -107,7 +107,7 @@ class Grid:
             row, column = self.change1d_to_2d(location, self.edge)
             print("###")
         elif player == "AI":
-            location = agent.agent_location(grid)
+            location = agent.agent_location(self)
             row, column = self.change1d_to_2d(location, self.edge)
             print("@@@")
             print(agent.grid_current_vals)
@@ -125,13 +125,13 @@ class Grid:
         return True, location
 
     def game(self, player1, player2, defined_agent, print_grid, alpha):
-        grid.reset_grid()
+        self.reset_grid()
         if print_grid:
-            grid.print_grid()
+            self.print_grid()
         # turn = [True] player1, [False] player2
         turn = True
         # until the board is full:
-        while not grid.is_full():
+        while not self.is_full():
             if turn:
                 player = player1
                 symbol = 'x'
@@ -139,7 +139,7 @@ class Grid:
                 player = player2
                 symbol = 'o'
             print(defined_agent.current_grid)
-            valid_location, location = grid.choose_location(symbol, player, agent=defined_agent)
+            valid_location, location = self.choose_location(symbol, player, agent=defined_agent)
             print(defined_agent.current_grid)
             while not valid_location:
                 if player == 'human':
@@ -148,14 +148,14 @@ class Grid:
                     print("Choosing Again")
                 if player == 'AI':
                     print(defined_agent.grid_current_vals)
-                    defined_agent.full_square_backpropagation(location, grid, alpha)
+                    defined_agent.full_square_backpropagation(location, self, alpha)
                     print(defined_agent.grid_current_vals)
-                valid_location, location = grid.choose_location(symbol, player, agent=defined_agent)
-            winner = grid.find_a_winner()
+                valid_location, location = self.choose_location(symbol, player, agent=defined_agent)
+            winner = self.find_a_winner()
             # change for player2
             turn = not turn
             if print_grid:
-                grid.print_grid()
+                self.print_grid()
             if winner != 'no_winner':
                 print(defined_agent.grid_current_vals)
                 defined_agent.win_or_lose_backpropagation(location, alpha)
@@ -164,13 +164,18 @@ class Grid:
             # Q-Learning implementation if the player is the AI
             if player == 'AI':
                 print(defined_agent.grid_current_vals)
-                defined_agent.q_learning_backpropagation(location, grid, bp_alpha=alpha, q_alpha=self.Q_ALPHA)
+                defined_agent.q_learning_backpropagation(location, self, bp_alpha=alpha, q_alpha=self.Q_ALPHA)
                 print(defined_agent.grid_current_vals)
 
         return "draw"
 
+    def training(self, iterations, existing_weights, player1, player2, print_grid, alpha):
+        agent = ag.Agent(weights=existing_weights)
+        while iterations > 0:
+            self.game(player1=player1, player2=player2, defined_agent=agent, print_grid=print_grid, alpha=alpha)
+            iterations -= 1
+        agent.neural_net.print_weights()
 
-grid = Grid(3)
-niro = ag.Agent()
-result = grid.game(player1='computer', player2='AI', defined_agent=niro, print_grid=True, alpha=0.01)
-print(result)
+
+g = Grid(3)
+g.training(1, existing_weights=True, player1="computer", player2='AI', print_grid=True, alpha=0.05)
