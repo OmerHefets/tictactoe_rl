@@ -20,7 +20,6 @@ class NeuralNet:
         self.permutations([], 1, 9)
         if existing_weights:
             self.load_weights()
-            print(self.weights)
         else:
             self.init_random_weights(is_rand=True)
 
@@ -58,15 +57,21 @@ class NeuralNet:
             random_bias = (random_bias - 0.5) * 2
             self.bias[i] = random_bias
 
-    def print_weights(self):
+    def save_weights(self):
         for i in range(1, self.nn_length):
-            filename = "weights" + str(i) + ".csv"
-            np.savetxt(filename, self.weights[i] , delimiter=",")
+            weights_filename = "weights" + str(i) + ".csv"
+            np.savetxt(weights_filename, self.weights[i], delimiter=",")
+            bias_filename = "bias" + str(i) + ".csv"
+            np.savetxt(bias_filename, self.bias[i], delimiter=",")
 
     def load_weights(self):
         for i in range(1, self.nn_length):
-            filename = "weights" + str(i) + ".csv"
-            self.weights[i] = np.genfromtxt(filename, delimiter=",")
+            weights_filename = "weights" + str(i) + ".csv"
+            self.weights[i] = np.genfromtxt(weights_filename, delimiter=",")
+            bias_filename = "bias" + str(i) + ".csv"
+            self.bias[i] = np.genfromtxt(bias_filename, delimiter=",")
+            # reshaping the bias for (n, 1) instead of (n,)
+            self.bias[i] = np.reshape(self.bias[i], (len(self.bias[i]), 1))
 
     # Recursive function for defining array of (2^n - 1 ) arrays of (n * n) grid permutations
     def permutations(self, arr, index, MAX_VAL):

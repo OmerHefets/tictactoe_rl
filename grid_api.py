@@ -4,11 +4,15 @@ import agent_api as ag
 
 class Grid:
     Q_ALPHA = 0.5
+    wins = {}
 
     def __init__(self, edge):
         self.edge = edge
         # Make (edge * edge) dimensional grid. initialize to 0 (empty) values
         self.grid = [[0 for x in range(edge)] for y in range(edge)]
+        self.wins["x_player"] = 0
+        self.wins["o_player"] = 0
+        self.wins["draw"] = 0
 
     # Print the current grid values in a 2D grid shape
     def print_grid(self):
@@ -30,6 +34,18 @@ class Grid:
                 if self.grid[i][j] == 0:
                     return False
         return True
+
+    def check_indexes_status(self):
+        full_indexes = []
+        empty_indexes = []
+        for i in range(self.edge):
+            for j in range(self.edge):
+                location = self.edge * i + j
+                if self.grid[i][j] != 0:
+                    full_indexes.append(location)
+                else:
+                    empty_indexes.append(location)
+        return full_indexes, empty_indexes
 
     # set the grid to specific values, for testing
     def set_grid(self, values):
@@ -109,9 +125,8 @@ class Grid:
         elif player == "AI":
             location = agent.agent_location(self)
             row, column = self.change1d_to_2d(location, self.edge)
-            print("@@@")
-            print(agent.grid_current_vals)
-            print("@@@")
+            # print(agent.grid_current_vals)
+            # print("@@@")
         else:
             print("no such player!")
             location = (random.randint(1, 9) - 1)
@@ -138,44 +153,51 @@ class Grid:
             else:
                 player = player2
                 symbol = 'o'
-            print(defined_agent.current_grid)
+            # print(defined_agent.current_grid)
             valid_location, location = self.choose_location(symbol, player, agent=defined_agent)
-            print(defined_agent.current_grid)
+            # print(defined_agent.current_grid)
             while not valid_location:
                 if player == 'human':
                     print("The spot is occupied")
                 if player == 'computer':
                     print("Choosing Again")
                 if player == 'AI':
-                    print(defined_agent.grid_current_vals)
+                    # print(defined_agent.grid_current_vals)
                     defined_agent.full_square_backpropagation(location, self, alpha)
-                    print(defined_agent.grid_current_vals)
+                    # print(defined_agent.grid_current_vals)
                 valid_location, location = self.choose_location(symbol, player, agent=defined_agent)
             winner = self.find_a_winner()
             # change for player2
             turn = not turn
             if print_grid:
+                if player == 'AI':
+                    print("AI move:")
                 self.print_grid()
             if winner != 'no_winner':
-                print(defined_agent.grid_current_vals)
+                # print(defined_agent.grid_current_vals)
                 defined_agent.win_or_lose_backpropagation(location, alpha)
-                print(defined_agent.grid_current_vals)
+                # print(defined_agent.grid_current_vals)
                 return winner
             # Q-Learning implementation if the player is the AI
             if player == 'AI':
-                print(defined_agent.grid_current_vals)
+                # print(defined_agent.grid_current_vals)
                 defined_agent.q_learning_backpropagation(location, self, bp_alpha=alpha, q_alpha=self.Q_ALPHA)
-                print(defined_agent.grid_current_vals)
-
+                # print(defined_agent.grid_current_vals)
         return "draw"
+
+    def count_wins(self, result):
+        self.wins[result] += 1
 
     def training(self, iterations, existing_weights, player1, player2, print_grid, alpha):
         agent = ag.Agent(weights=existing_weights)
         while iterations > 0:
-            self.game(player1=player1, player2=player2, defined_agent=agent, print_grid=print_grid, alpha=alpha)
+            print("----RESET GAME----")
+            winner = self.game(player1=player1, player2=player2, defined_agent=agent, print_grid=print_grid, alpha=alpha)
+            self.count_wins(winner)
             iterations -= 1
-        agent.neural_net.print_weights()
+        agent.neural_net.save_weights()
+        print(self.wins)
 
 
 g = Grid(3)
-g.training(1, existing_weights=True, player1="computer", player2='AI', print_grid=True, alpha=0.05)
+g.training(50000, existing_weights=True, player1="computer", player2='AI', print_grid=True, alpha=0.03)

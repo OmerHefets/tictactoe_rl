@@ -43,7 +43,12 @@ class Agent:
     def full_square_backpropagation(self, filled_location, grid, alpha):
         input_vector = self.get_grid_input(grid.get_grid(), self.neural_net.get_nn_value("permutations"))
         y_vector = copy.copy(self.grid_current_vals)
-        y_vector[filled_location] = 0
+        # make all full indexes equal 0 and empty equal 1, for faster convergence
+        full_indexes, empty_indexes = grid.check_indexes_status()
+        for index in full_indexes:
+            y_vector[index] = 0
+        for index in empty_indexes:
+            y_vector[index] = 1
         self.neural_net.sgd_backpropagation(input_vector, y_vector, alpha=alpha)
 
     """
@@ -66,8 +71,8 @@ class Agent:
         projected_grid_vals = h_vector[self.neural_net.nn_length]
         q_next_state = max(projected_grid_vals)
         q_current = max(self.grid_current_vals)
-        print(q_current)
-        print(self.grid_current_vals[filled_location])
+        # print(q_current)
+        # print(self.grid_current_vals[filled_location])
         y_vector = copy.copy(self.grid_current_vals)
         y_vector[filled_location] = (q_alpha * q_current) + (1 - q_alpha) * q_next_state
         self.neural_net.sgd_backpropagation(previous_input_vector, y_vector, alpha=bp_alpha)
