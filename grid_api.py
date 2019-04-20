@@ -121,7 +121,7 @@ class Grid:
         elif player == "computer":
             location = (random.randint(1, 9) - 1)
             row, column = self.change1d_to_2d(location, self.edge)
-            print("###")
+            # print("###")
         elif player == "AI":
             location = agent.agent_location(self)
             row, column = self.change1d_to_2d(location, self.edge)
@@ -157,10 +157,11 @@ class Grid:
             valid_location, location = self.choose_location(symbol, player, agent=defined_agent)
             # print(defined_agent.current_grid)
             while not valid_location:
-                if player == 'human':
-                    print("The spot is occupied")
-                if player == 'computer':
-                    print("Choosing Again")
+                if print_grid:
+                    if player == 'human':
+                        print("The spot is occupied")
+                    if player == 'computer':
+                        print("Choosing Again")
                 if player == 'AI':
                     # print(defined_agent.grid_current_vals)
                     defined_agent.full_square_backpropagation(location, self, alpha)
@@ -191,7 +192,8 @@ class Grid:
     def training(self, iterations, existing_weights, player1, player2, print_grid, alpha):
         agent = ag.Agent(weights=existing_weights)
         while iterations > 0:
-            print("----RESET GAME----")
+            if print_grid:
+                print("----RESET GAME----")
             winner = self.game(player1=player1, player2=player2, defined_agent=agent, print_grid=print_grid, alpha=alpha)
             self.count_wins(winner)
             iterations -= 1
@@ -200,4 +202,4 @@ class Grid:
 
 
 g = Grid(3)
-g.training(50000, existing_weights=True, player1="computer", player2='AI', print_grid=True, alpha=0.03)
+g.training(100000, existing_weights=True, player1="computer", player2='AI', print_grid=True, alpha=0.02)
